@@ -6,7 +6,7 @@
 1. [Referências](#referências)
 1. [Utilização](#utilização)
 	1. [Sintaxe do comando `curl`](#sintaxe-do-comando-curl)
-	1. [Saída do comando `curl`](#saida-do-comando-curl)
+	1. [Saída do comando `curl`](#saída-do-comando-curl)
 		1. [Consultas a registro específico](#consultas-a-registro-específico)
 		1. [Consultas a registros múltiplos via busca](#consultas-a-registros-múltiplos-via-busca)
 1. [Parâmetros para consultas e alterações](#parâmetros-para-consultas-e-alterações)
