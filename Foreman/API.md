@@ -6,6 +6,9 @@
 1. [Referências](#referências)
 1. [Utilização](#utilização)
 	1. [Sintaxe do comando `curl`](#sintaxe-do-comando-curl)
+	1. [Saída do comando `curl`](#saida-do-comando-curl)
+		1. [Consultas a registro específico](#consultas-a-registro-específico)
+		1. [Consultas a registros múltiplos via busca](#consultas-a-registros-múltiplos-via-busca)
 
 ## Descrição
 
@@ -46,3 +49,38 @@ Opções:
 		- Também é possível especificar o nome, mas isto é problemático - Ver bugs:
 			- [API find_resource by name finds by ID instead when first character of name is a digit](http://projects.theforeman.org/issues/3876)
 			- [Info commands must always use IDs instead of names in api calls](http://projects.theforeman.org/issues/3954)
+
+### Saída do comando `curl`
+
+A API retorna uma string JSON com os registros especificados ou encontrados, e seus parâmetros
+
+#### Consultas a registro específico
+
+Ao especificar o registro na URL (campo/valor), o comando retorna os resultados em uma linha:
+
+```
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" https://<Servidor Foreman>/api/hosts/<FQDN>
+Enter host password for user '<Usuário>':
+{"name":"<FQDN>","id":<ID>,"ip":"<IP primário>",...}
+```
+
+#### Consultas a registros múltiplos via busca
+
+Ao especificar uma string de busca via HTTP GET, o comando retorna um registro JSON com as estatísticas da busca e outro com os resultados em si, também em uma linha:
+
+```
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" -X GET -d '{ "search":"name~<Parte do nome>%" }' https://<Servidor Foreman>/api/hostgroups
+Enter host password for user 'emerson.prado':
+{
+  "total": 1388,	# Total de registros existentes no servidor
+  "subtotal": 12, # Número de registros que correspondem à busca
+  "page": 1,
+  "per_page": 50,
+  "search": "name~<Parte do nome>%",
+  "sort": {
+    "by": null,
+    "order": null
+  },
+  "results": [{"id":<ID 1>,"name":"<Nome 1>","title":"<Nome completo 1>",...},{"id":<ID 2>,"name":"<Nome 2>","title":"<Nome completo 2>",...},{"id":<ID 3>,"name":"<Nome 3>","title":"<Nome completo 3>",...},...]
+}
+```
