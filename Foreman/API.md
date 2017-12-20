@@ -9,6 +9,9 @@
 	1. [Saída do comando `curl`](#saida-do-comando-curl)
 		1. [Consultas a registro específico](#consultas-a-registro-específico)
 		1. [Consultas a registros múltiplos via busca](#consultas-a-registros-múltiplos-via-busca)
+1. [Parâmetros para consultas e alterações](#parâmetros-para-consultas-e-alterações)
+	1. [Tipos de registro](#tipos-de-registro)
+	1. [Campos principais](#campos-principais)
 
 ## Descrição
 
@@ -87,3 +90,47 @@ Enter host password for user '<Usuário>':
   "results": [{"id":<ID 1>,"name":"<Nome 1>","title":"<Nome completo 1>",...},{"id":<ID 2>,"name":"<Nome 2>","title":"<Nome completo 2>",...},{"id":<ID 3>,"name":"<Nome 3>","title":"<Nome completo 3>",...},...]
 }
 ```
+
+## Parâmetros para consultas e alterações
+
+Segue abaixo uma lista, não exaustiva, dos recursos que podem ser consultados e alterados via API do Foreman
+
+### Tipos de registro
+
+- architectures
+- domains
+- environments
+- hostgroups
+- hosts
+- operatingsystems
+- realms
+- reports
+- puppetclasses
+
+### Campos principais
+
+- Comuns a todos os registros
+	- id					# Índice do registro (referenciável na URL)
+- Hosts
+	- name				# FQDN do servidor (referenciável na URL)
+	- environment_id		# ID do ambiente
+	- environment_name	# Nome do ambiente
+	- last_report			# Hora UTC do último relatório de execução do agente Puppet
+	- domain_id			# ID do domínio
+	- domain_name			# Nome do domínio
+	- hostgroup_id		# ID do grupo
+	- hostgroup_name		# Nome do grupo
+	- puppet_ca_proxy_id	# ID do Puppet CA
+	- puppet_proxy_id		# ID do Puppet Master
+	- certname			# Nome retornado pelo agente Puppet - Deve ser idêntico ao campo "name"
+	- all_puppetclasses	# Conjunto das classes Puppets aplicadas ao nó
+	- parameters			# Parâmetros aplicados às classes Puppet
+- Hostgroups
+	- name				# Nome do grupo (somente o último nível)
+	- title				# Nome completo do grupo (todos os níveis)
+	- ancestry			# Ascendência do grupo - IDs de todos os ascendentes separados por - barra
+	- puppet_proxy_id		# ID do Puppet Master
+	- puppet_ca_proxy_id	# ID do Puppet CA
+- Opções (não exaustivo):
+	- per_page
+	- page
