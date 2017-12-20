@@ -23,6 +23,8 @@ A API do Foreman permite ler e escrever no banco de dados do Foreman via linha d
 
 ## Utilização
 
+As consultas e alterações via API são feitas através de requisições ao contexto `/api` do Foreman.
+
 O programa `curl`, presente em muitas instalações Linux/Unix, é uma ótima ferramenta para acesso à API do Foreman
 
 ### Sintaxe do comando `curl`
