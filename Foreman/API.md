@@ -49,6 +49,7 @@ Opções:
 		- Também é possível especificar o nome, mas isto é problemático - Ver bugs:
 			- [API find_resource by name finds by ID instead when first character of name is a digit](http://projects.theforeman.org/issues/3876)
 			- [Info commands must always use IDs instead of names in api calls](http://projects.theforeman.org/issues/3954)
+		- Para nomes de _hosts_, é possível usar o FQDN neste campo, desde que o mesmo inicie por letra - Usar o FQDN, não o nome curto
 
 ### Saída do comando `curl`
 
