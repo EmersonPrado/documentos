@@ -41,8 +41,8 @@ Opções:
 	- `PUT -d '{ "<Parâmetro>":"<Valor>","<Parâmetro>":"<Valor>"... }'` - Altera registro(s)
 	- `DELETE` - Remove registro(s)
 	- default: lista o registro indicado na URL (campo e valor obrigatórios):
-		- `https://<Servidor Foreman>/api/<Campo>/<Valor>`
-- URL - Servidor Foreman - `https://<Servidor Foreman>/<Campo>[?<Opções>|<Valor>]`
+		- `https://<Servidor Foreman>/api/v2/<Campo>/<Valor>`
+- URL - Servidor Foreman - `https://<Servidor Foreman>/api/v2/<Campo>[?<Opções>|<Valor>]`
 	- Campo - O tipo de registro que será lido ou escrito - `hosts`, `domains`, `hostgroups`, etc.
 	- Opções - Parâmetros de busca ou exibição - `per_page=<Número>`, `page=<Número>`, etc.
 	- Valor - ID de um registro (host, domínio, etc.) específico
@@ -60,7 +60,7 @@ A API retorna uma string JSON com os registros especificados ou encontrados, e s
 Ao especificar o registro na URL (campo/valor), o comando retorna os resultados em uma linha:
 
 ```
-$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" https://<Servidor Foreman>/api/hosts/<FQDN>
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" https://<Servidor Foreman>/api/v2/hosts/<FQDN>
 Enter host password for user '<Usuário>':
 {"name":"<FQDN>","id":<ID>,"ip":"<IP primário>",...}
 ```
@@ -70,7 +70,7 @@ Enter host password for user '<Usuário>':
 Ao especificar uma string de busca via HTTP GET, o comando retorna um registro JSON com as estatísticas da busca e outro com os resultados em si, também em uma linha:
 
 ```
-$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" -X GET -d '{ "search":"name~<Parte do nome>%" }' https://<Servidor Foreman>/api/hostgroups
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" -X GET -d '{ "search":"name~<Parte do nome>%" }' https://<Servidor Foreman>/api/v2/hostgroups
 Enter host password for user 'emerson.prado':
 {
   "total": 1388,	# Total de registros existentes no servidor
