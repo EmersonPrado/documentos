@@ -70,7 +70,8 @@ A API retorna uma string JSON com os registros especificados ou encontrados, e s
 Ao especificar o registro na URL (campo/valor), o comando retorna os resultados em uma linha:
 
 ```
-$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" https://<Servidor Foreman>/api/hosts/<FQDN>
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	https://<Servidor Foreman>/api/hosts/<FQDN>
 Enter host password for user '<Usuário>':
 {"name":"<FQDN>","id":<ID>,"ip":"<IP primário>",...}
 ```
@@ -80,7 +81,9 @@ Enter host password for user '<Usuário>':
 Ao especificar uma string de busca via HTTP GET, o comando retorna um registro JSON com as estatísticas da busca e outro com os resultados em si, também em uma linha:
 
 ```
-$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" -X GET -d '{ "search":"name~<Parte do nome>%" }' https://<Servidor Foreman>/api/hostgroups
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	-X GET -d '{ "search":"name~<Parte do nome>%" }' \
+	https://<Servidor Foreman>/api/hostgroups
 Enter host password for user '<Usuário>':
 {
   "total": 1388,	# Total de registros existentes no servidor
@@ -92,7 +95,9 @@ Enter host password for user '<Usuário>':
     "by": null,
     "order": null
   },
-  "results": [{"id":<ID 1>,"name":"<Nome 1>","title":"<Nome completo 1>",...},{"id":<ID 2>,"name":"<Nome 2>","title":"<Nome completo 2>",...},{"id":<ID 3>,"name":"<Nome 3>","title":"<Nome completo 3>",...},...]
+  "results": [{"id":<ID 1>,"name":"<Nome 1>","title":"<Nome completo 1>",...},{"id":<ID 2>,"name":"
+<Nome 2>","title":"<Nome completo 2>",...},{"id":<ID 3>,"name":"<Nome 3>","title":"<Nome completo 3
+>",...},...]
 }
 ```
 
@@ -150,14 +155,17 @@ A consulta a registros mostra todos os parâmetros de um conjunto de registros. 
 
 Basta especificar o tipo de registro no final da URL:
 ```
-curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" https://<Servidor Foreman>/api/<Tipo>[?<Opção>[&<Opção>...]]
+curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	https://<Servidor Foreman>/api/<Tipo>[?<Opção>[&<Opção>...]]
 ```
 
 #### Registros filtrados
 
 Especificar o filtro no comando HTTP, mantendo a mesma URL:
 ```
-curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" -X GET -d '{ "search":"<String busca>" }' https://<Servidor Foreman>/api/<Tipo>[?<Opção>[&<Opção>...]]
+curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	-X GET -d '{ "search":"<String busca>" }' \
+	https://<Servidor Foreman>/api/<Tipo>[?<Opção>[&<Opção>...]]
 ```
 
 A string de busca tem o formato `<Campo>=<Valor>` ou `<Campo>~<Parte do valor>`.
