@@ -17,6 +17,9 @@
 		1. [Todos os registros](#todos-os-registros)
 		1. [Registros filtrados](#registros-filtrados)
 		1. [Registro específico](#registro-específico)
+	1. [Criar registros](#criar-registros)
+	1. [Alterar parâmetros de registros](#alterar-parâmetros-de-registros)
+	1. [Remover registros](#remover-registros)
 
 ## Descrição
 
@@ -176,3 +179,36 @@ Especificar o ID do registro (ou o nome, caso não inicie com dígito e não ten
 ```
 https://<Servidor Foreman>/api/<Tipo>/<ID>[?<Opção>[&<Opção>...]]
 ```
+
+### Criar registros
+
+A criação de registros é feita através do método HTTP POST:
+```
+curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+-X POST -d '{ "<Parâmetro 1>":"<Valor 1>","<Parâmetro 2>":"<Valor 2>",... }' \
+https://<Servidor Foreman>/api/<Tipo>
+```
+
+> Verificar os parâmetros obrigatórios do tipo de recurso a ser criado
+
+### Alterar parâmetros de registros
+
+A alteração de parâmetros é feita através do método HTTP PUT:
+```
+curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+-X PUT -d '{ "<Parâmetro 1>":"<Valor 1>","<Parâmetro 2>":"<Valor 2>",... }' \
+https://<Servidor Foreman>/api/<Tipo>/<ID>
+```
+
+> Usar os comandos de consulta para verificar o ID do recurso a ser alterado
+
+### Remover registros
+
+A remoção de registros é feita através do método HTTP DELETE:
+
+```
+curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+-X DELETE https://<Servidor Foreman>/api/<Tipo>/<ID>
+```
+
+> Usar os comandos de consulta para verificar o ID do recurso a ser alterado
