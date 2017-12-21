@@ -12,6 +12,11 @@
 1. [Parâmetros para consultas e alterações](#parâmetros-para-consultas-e-alterações)
 	1. [Tipos de registro](#tipos-de-registro)
 	1. [Campos principais](#campos-principais)
+1. [Comandos da API](#comandos-da-api)
+	1. [Consultar registros](#consultar-registros)
+		1. [Todos os registros](#todos-os-registros)
+		1. [Registros filtrados](#registros-filtrados)
+		1. [Registro específico](#registro-específico)
 
 ## Descrição
 
@@ -134,3 +139,32 @@ Segue abaixo uma lista, não exaustiva, dos recursos que podem ser consultados e
 - Opções (não exaustivo):
 	- per_page
 	- page
+
+## Comandos da API
+
+### Consultar registros
+
+A consulta a registros mostra todos os parâmetros de um conjunto de registros. Podemos visualizar todos os registros de um determinado tipo, selecionar um grupo de registros mediante busca, ou determinar um registro específico.
+
+#### Todos os registros
+
+Basta especificar o tipo de registro no final da URL:
+```
+curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" https://<Servidor Foreman>/api/<Tipo>[?<Opção>[&<Opção>...]]
+```
+
+#### Registros filtrados
+
+Especificar o filtro no comando HTTP, mantendo a mesma URL:
+```
+curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" -X GET -d '{ "search":"<String busca>" }' https://<Servidor Foreman>/api/<Tipo>[?<Opção>[&<Opção>...]]
+```
+
+A string de busca tem o formato `<Campo>=<Valor>` ou `<Campo>~<Parte do valor>`.
+
+#### Registro específico
+
+Especificar o ID do registro (ou o nome, caso não inicie com dígito e não tenha caracteres especiais, espaços, etc.) no final da URL:
+```
+https://<Servidor Foreman>/api/<Tipo>/<ID>[?<Opção>[&<Opção>...]]
+```
