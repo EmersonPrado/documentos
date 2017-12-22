@@ -12,6 +12,14 @@
 1. [Parâmetros para consultas e alterações](#parâmetros-para-consultas-e-alterações)
 	1. [Tipos de registro](#tipos-de-registro)
 	1. [Campos principais](#campos-principais)
+1. [Comandos da API](#comandos-da-api)
+	1. [Consultar registros](#consultar-registros)
+		1. [Todos os registros](#todos-os-registros)
+		1. [Registros filtrados](#registros-filtrados)
+		1. [Registro específico](#registro-específico)
+	1. [Criar registros](#criar-registros)
+	1. [Alterar parâmetros de registros](#alterar-parâmetros-de-registros)
+	1. [Remover registros](#remover-registros)
 
 ## Descrição
 
@@ -65,7 +73,8 @@ A API retorna uma string JSON com os registros especificados ou encontrados, e s
 Ao especificar o registro na URL (campo/valor), o comando retorna os resultados em uma linha:
 
 ```
-$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" https://<Servidor Foreman>/api/hosts/<FQDN>
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	https://<Servidor Foreman>/api/hosts/<FQDN>
 Enter host password for user '<Usuário>':
 {"name":"<FQDN>","id":<ID>,"ip":"<IP primário>",...}
 ```
@@ -75,7 +84,9 @@ Enter host password for user '<Usuário>':
 Ao especificar uma string de busca via HTTP GET, o comando retorna um registro JSON com as estatísticas da busca e outro com os resultados em si, também em uma linha:
 
 ```
-$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" -X GET -d '{ "search":"name~<Parte do nome>%" }' https://<Servidor Foreman>/api/hostgroups
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	-X GET -d '{ "search":"name~<Parte do nome>%" }' \
+	https://<Servidor Foreman>/api/hostgroups
 Enter host password for user '<Usuário>':
 {
   "total": 1388,	# Total de registros existentes no servidor
@@ -87,7 +98,9 @@ Enter host password for user '<Usuário>':
     "by": null,
     "order": null
   },
-  "results": [{"id":<ID 1>,"name":"<Nome 1>","title":"<Nome completo 1>",...},{"id":<ID 2>,"name":"<Nome 2>","title":"<Nome completo 2>",...},{"id":<ID 3>,"name":"<Nome 3>","title":"<Nome completo 3>",...},...]
+  "results": [{"id":<ID 1>,"name":"<Nome 1>","title":"<Nome completo 1>",...},{"id":<ID 2>,"name":"
+<Nome 2>","title":"<Nome completo 2>",...},{"id":<ID 3>,"name":"<Nome 3>","title":"<Nome completo 3
+>",...},...]
 }
 ```
 
@@ -134,3 +147,68 @@ Segue abaixo uma lista, não exaustiva, dos recursos que podem ser consultados e
 - Opções (não exaustivo):
 	- per_page
 	- page
+
+## Comandos da API
+
+### Consultar registros
+
+A consulta a registros mostra todos os parâmetros de um conjunto de registros. Podemos visualizar todos os registros de um determinado tipo, selecionar um grupo de registros mediante busca, ou determinar um registro específico.
+
+#### Todos os registros
+
+Basta especificar o tipo de registro no final da URL:
+```
+curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	https://<Servidor Foreman>/api/<Tipo>[?<Opção>[&<Opção>...]]
+```
+
+#### Registros filtrados
+
+Especificar o filtro no comando HTTP, mantendo a mesma URL:
+```
+curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	-X GET -d '{ "search":"<String busca>" }' \
+	https://<Servidor Foreman>/api/<Tipo>[?<Opção>[&<Opção>...]]
+```
+
+A string de busca tem o formato `<Campo>=<Valor>` ou `<Campo>~<Parte do valor>`.
+
+#### Registro específico
+
+Especificar o ID do registro (ou o nome, caso não inicie com dígito e não tenha caracteres especiais, espaços, etc.) no final da URL:
+```
+https://<Servidor Foreman>/api/<Tipo>/<ID>[?<Opção>[&<Opção>...]]
+```
+
+### Criar registros
+
+A criação de registros é feita através do método HTTP POST:
+```
+curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+-X POST -d '{ "<Parâmetro 1>":"<Valor 1>","<Parâmetro 2>":"<Valor 2>",... }' \
+https://<Servidor Foreman>/api/<Tipo>
+```
+
+> Verificar os parâmetros obrigatórios do tipo de recurso a ser criado
+
+### Alterar parâmetros de registros
+
+A alteração de parâmetros é feita através do método HTTP PUT:
+```
+curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+-X PUT -d '{ "<Parâmetro 1>":"<Valor 1>","<Parâmetro 2>":"<Valor 2>",... }' \
+https://<Servidor Foreman>/api/<Tipo>/<ID>
+```
+
+> Usar os comandos de consulta para verificar o ID do recurso a ser alterado
+
+### Remover registros
+
+A remoção de registros é feita através do método HTTP DELETE:
+
+```
+curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+-X DELETE https://<Servidor Foreman>/api/<Tipo>/<ID>
+```
+
+> Usar os comandos de consulta para verificar o ID do recurso a ser alterado
