@@ -21,6 +21,7 @@
 	1. [Alterar parâmetros de registros](#alterar-parâmetros-de-registros)
 	1. [Remover registros](#remover-registros)
 1. [Formatação dos resultados](#formatação-dos-resultados)
+	1. [Filtragem e formatação com `tr`, `sed`, `grep`, etc.](#filtragem-e-formatação-com-tr,-sed,-grep,-etc.)
 
 ## Descrição
 
@@ -254,3 +255,93 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
   },
   "results": [{"id":<ID>,"name":"<Nome>","title":"<Título>",...},{"id":<ID>,"name":"<Nome>","title":"<Título>",...},{"id":<ID>,"name":"<Nome>","title":"<Título>",...},...]
 ```
+
+### Filtragem e formatação com `tr`, `sed`, `grep`, etc.
+
+Uma necessidade natural é separar os campos com quebras de linhas, em vez de vírgulas. Isto pode ser feito facilmente com o comando `tr`:
+
+```
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" 'https://<Servidor Foreman>/api/hostgroups/<ID>' | tr , '\n'
+...
+{"id":<ID>
+"name":"<Nome>"
+"title":"<Título>"
+...
+"all_puppetclasses":[{"id":<ID>
+"name":"<Nome>"
+"module_name":"<Módulo>"}
+...]
+...}
+```
+
+Convenientemente, cada campo ficou em sua própria linha, permitindo filtragens adicionais com `sed` ou `grep`. Exceto nos campos aninhados (`all_puppetclasses`), pois o campo externo não é separado dos internos por vírgula, então o primeiro campo interno apareceu junto com o externo.  
+Como cada campo está delimitado por chaves, podemos separar as linhas em cada conjunto de vírgulas e/ou chaves. Pra esta filtragem mais elaborada, podemos usar o comando `sed`:
+
+```
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" 'https://<Servidor Foreman>/api/hostgroups/<ID>' | sed 's/[,{}][,{}]*/\n/g'
+...
+"id":275
+"name":"TREINAMENTO"
+"title":"SP/TREINAMENTO"
+...
+"all_puppetclasses":[
+"id":<ID>
+"name":"<Nome>"
+"module_name":"<Módulo>"
+...
+]
+...
+]
+```
+
+Desta vez, os campos aninhados foram separados com clareza, ficando o campo externo em uma linha separada. Assim fica fácil filtrar campos específicos, usando `grep`:
+
+```
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" 'https://<Servidor Foreman>/api/hostgroups/<ID>' | sed 's/[,{}][,{}]*/\n/g' | grep 'environment_'
+...
+"environment_id":<ID ambiente>
+"environment_name":<Nome ambiente>
+```
+
+Ou filtrar por trechos, usando `sed`:
+
+```
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" 'https://<Servidor Foreman>/api/hostgroups/<ID>' | sed 's/[,{}][,{}]*/\n/g' | sed -n '/all_puppetclasses/,/]/p'
+...
+"all_puppetclasses":[
+"id":<ID>
+"name":"<Nome>"
+"module_name":"<Módulo>"
+"id":<ID>
+"name":"<Nome>"
+"module_name":"<Módulo>"
+...
+]
+```
+
+Um problema é que há campos com nomes repetidos dentro dos campos aninhados. Por exemplo, há campos `id` no registro, e também dentro dos campos `all_puppetclasses` e `puppetclasses`. Então a filtragem com `grep` retornaria várias informações, sendo só uma correta. A solução é primeiro filtrar o trecho que contém os campos de forma única, depois os campos específicos:
+
+```
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" 'https://<Servidor Foreman>/api/hostgroups/<ID>' | sed 's/[,{}][,{}]*/\n/g' | sed '/all_puppetclasses/,$d' | grep -E '"(id|name|title)"'
+...
+"id":<ID>
+"name":"<Nome>"
+"title":"<Título>"
+```
+
+> O segundo comando `sed` remove tudo a partir de `all_puppetclasses`. Para os _hostgroups_, isso significa remover todos os campos aninhados.
+
+> Note a inclusão das aspas duplas no comando `grep`. Isto é necessário para filtrar campos com os nomes exatos, e não qualquer coisa que contenha "id", "name" ou "title".
+
+Outro exemplo:
+
+```
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" 'https://<Servidor Foreman>/api/hostgroups/<ID>' | sed 's/[,{}][,{}]*/\n/g' | sed -n '/all_puppetclasses/,/]/p' | grep '"name"'
+...
+"name":"<Nome da classe>"
+"name":"<Nome da classe>"
+"name":"<Nome da classe>"
+...
+```
+
+Naturalmente, pode-se filtrar e formatar mais. Por exemplo: utilizar `cut` para remover o nome do parâmetro, deixando apenas o valor (caso a consulta seja de um único campo), outro `tr` para remover as aspas, etc. O limite é a criatividade (e o tempo).
