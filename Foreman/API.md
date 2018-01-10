@@ -20,8 +20,8 @@
 	1. [Criar registros](#criar-registros)
 	1. [Alterar parâmetros de registros](#alterar-parâmetros-de-registros)
 	1. [Remover registros](#remover-registros)
-1. [Formatação dos resultados](#formatação-dos-resultados)
-	1. [Filtragem e formatação com `tr`, `sed`, `grep`, etc.](#filtragem-e-formatação-com-tr,-sed,-grep,-etc.)
+1. [Formatação de resultados](#formatação-de-resultados)
+	1. [Filtragem e formatação com `tr`, `sed`, `grep`, etc.](#filtragem-e-formatação-com-tr-sed-grep-etc)
 
 ## Descrição
 
@@ -230,7 +230,7 @@ Em qualquer caso, é bom ter em mente como a saída da API é formatada:
 - Ao listar vários registros, a API retorna uma tabela com estatísticas, depois uma única linha com todos os registros (entre colchetes)
 - Cada campo tem o formato `"<Parâmetro>":"<Valor>"`
 
-Abaixo um exemplo de saída com registro único. Note como o registro inteiro está entre chaves, e cada campo separado por vírgulas. No caso dos _hostgroups_, os campos `all_puppetclasses`, `puppetclasses` e `config_groups` contém vários campos aninhados - todos entre chaves e separados por vírgulas, e o conjunto inteiro entre colchetes. O campo `config_groups` também contém um campo aninhado - `puppetclasses` (que não é o mesmo `puppetclasses` anterior)- que, por sua vez, contém seus próprios campos aninhados, com a mesma formatação.
+Abaixo um exemplo de saída com registro único. Note como o registro inteiro está entre chaves, e cada campo separado por vírgulas. No caso dos _hostgroups_, os campos `all_puppetclasses`, `puppetclasses` e `config_groups` contém vários campos aninhados - todos entre chaves e separados por vírgulas, e o conjunto inteiro entre colchetes. O campo `config_groups` também contém um campo aninhado - `puppetclasses` (que não é o mesmo `puppetclasses` anterior) - que, por sua vez, contém seus próprios campos aninhados, com a mesma formatação.
 
 ```
 $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" 'https://<Servidor Foreman>/api/hostgroups/<ID>'
