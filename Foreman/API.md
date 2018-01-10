@@ -261,7 +261,8 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 Uma necessidade natural é separar os campos com quebras de linhas, em vez de vírgulas. Isto pode ser feito facilmente com o comando `tr`:
 
 ```
-$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" 'https://<Servidor Foreman>/api/hostgroups/<ID>' | tr , '\n'
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	'https://<Servidor Foreman>/api/hostgroups/<ID>' | tr , '\n'
 ...
 {"id":<ID>
 "name":"<Nome>"
@@ -278,7 +279,8 @@ Convenientemente, cada campo ficou em sua própria linha, permitindo filtragens 
 Como cada campo está delimitado por chaves, podemos separar as linhas em cada conjunto de vírgulas e/ou chaves. Pra esta filtragem mais elaborada, podemos usar o comando `sed`:
 
 ```
-$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" 'https://<Servidor Foreman>/api/hostgroups/<ID>' | sed 's/[,{}][,{}]*/\n/g'
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	'https://<Servidor Foreman>/api/hostgroups/<ID>' | sed 's/[,{}][,{}]*/\n/g'
 ...
 "id":275
 "name":"TREINAMENTO"
@@ -297,7 +299,8 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 Desta vez, os campos aninhados foram separados com clareza, ficando o campo externo em uma linha separada. Assim fica fácil filtrar campos específicos, usando `grep`:
 
 ```
-$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" 'https://<Servidor Foreman>/api/hostgroups/<ID>' | sed 's/[,{}][,{}]*/\n/g' | grep 'environment_'
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	'https://<Servidor Foreman>/api/hostgroups/<ID>' | sed 's/[,{}][,{}]*/\n/g' | grep 'environment_'
 ...
 "environment_id":<ID ambiente>
 "environment_name":<Nome ambiente>
@@ -306,7 +309,8 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 Ou filtrar por trechos, usando `sed`:
 
 ```
-$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" 'https://<Servidor Foreman>/api/hostgroups/<ID>' | sed 's/[,{}][,{}]*/\n/g' | sed -n '/all_puppetclasses/,/]/p'
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	'https://<Servidor Foreman>/api/hostgroups/<ID>' | sed 's/[,{}][,{}]*/\n/g' | sed -n '/all_puppetclasses/,/]/p'
 ...
 "all_puppetclasses":[
 "id":<ID>
@@ -322,7 +326,9 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 Um problema é que há campos com nomes repetidos dentro dos campos aninhados. Por exemplo, há campos `id` no registro, e também dentro dos campos `all_puppetclasses` e `puppetclasses`. Então a filtragem com `grep` retornaria várias informações, sendo só uma correta. A solução é primeiro filtrar o trecho que contém os campos de forma única, depois os campos específicos:
 
 ```
-$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" 'https://<Servidor Foreman>/api/hostgroups/<ID>' | sed 's/[,{}][,{}]*/\n/g' | sed '/all_puppetclasses/,$d' | grep -E '"(id|name|title)"'
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	'https://<Servidor Foreman>/api/hostgroups/<ID>' | sed 's/[,{}][,{}]*/\n/g' | \
+	sed '/all_puppetclasses/,$d' | grep -E '"(id|name|title)"'
 ...
 "id":<ID>
 "name":"<Nome>"
@@ -336,7 +342,9 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 Outro exemplo:
 
 ```
-$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" 'https://<Servidor Foreman>/api/hostgroups/<ID>' | sed 's/[,{}][,{}]*/\n/g' | sed -n '/all_puppetclasses/,/]/p' | grep '"name"'
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	'https://<Servidor Foreman>/api/hostgroups/<ID>' | sed 's/[,{}][,{}]*/\n/g' | \
+	sed -n '/all_puppetclasses/,/]/p' | grep '"name"'
 ...
 "name":"<Nome da classe>"
 "name":"<Nome da classe>"
