@@ -353,3 +353,11 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 ```
 
 Naturalmente, pode-se filtrar e formatar mais. Por exemplo: utilizar `cut` para remover o nome do parâmetro, deixando apenas o valor (caso a consulta seja de um único campo), outro `tr` para remover as aspas, etc. O limite é a criatividade (e o tempo).
+
+Por fim, ao filtrar saídas com múltiplos registros, é interessante processar apenas a linha contendo `"results":`, com um simples `grep`:
+
+```
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	-X GET -d "{ "search":"<Filtro>" }" 'https://<Servidor Foreman>/api/hostgroups/' | \
+	grep '"results":' | sed ...
+```
