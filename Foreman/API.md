@@ -200,7 +200,7 @@ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: ap
 https://<Servidor Foreman>/api/<Tipo>/<ID>
 ```
 
-> Usar os comandos de consulta para verificar o ID do recurso a ser alterado
+> Usar os [comandos de consulta](#registros-filtrados) para verificar o ID do recurso a ser alterado
 
 ### Remover registros
 
@@ -211,4 +211,4 @@ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: ap
 -X DELETE https://<Servidor Foreman>/api/<Tipo>/<ID>
 ```
 
-> Usar os comandos de consulta para verificar o ID do recurso a ser alterado
+> Usar os [comandos de consulta](#registros-filtrados) para verificar o ID do recurso a ser alterado
