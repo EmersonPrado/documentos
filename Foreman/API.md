@@ -20,6 +20,7 @@
 	1. [Criar registros](#criar-registros)
 	1. [Alterar parâmetros de registros](#alterar-parâmetros-de-registros)
 	1. [Remover registros](#remover-registros)
+1. [Formatação dos resultados](#formatação-dos-resultados)
 
 ## Descrição
 
@@ -212,3 +213,44 @@ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: ap
 ```
 
 > Usar os [comandos de consulta](#registros-filtrados) para verificar o ID do recurso a ser alterado
+
+## Formatação de resultados
+
+Como a API retorna uma string enorme com todos os resultados concatenados, é difícil extrair informações diretamente, especialmente em buscas que retornam vários registros. É necessário formatar a saída de forma mais conveniente.
+
+A complexidade da tarefa de transformar uma linha de texto JSON em uma tabela compreensível exige um processador de textos poderoso. Uma solução simples é concatenar, via _pipes_, vários processadores, como `tr`, `sed` e `grep`. Para formatação mais completa, é possível usar o `awk`, que possui inúmeros recursos de tratamento de strings aliados a lógica de programação.
+
+Em qualquer caso, é bom ter em mente como a saída da API é formatada:
+
+- Registros e seus campos são sempre separados por vírgulas
+- Grupos de registros e de campos aninhados ficam entre colchetes
+- Cada registro individual e cada campo dentro de campos aninhados fica entre chaves
+- Ao listar um único registro, a API retorna uma única linha com o registro (entre chaves)
+- Ao listar vários registros, a API retorna uma tabela com estatísticas, depois uma única linha com todos os registros (entre colchetes)
+- Cada campo tem o formato `"<Parâmetro>":"<Valor>"`
+
+Abaixo um exemplo de saída com registro único. Note como o registro inteiro está entre chaves, e cada campo separado por vírgulas. No caso dos _hostgroups_, os campos `all_puppetclasses`, `puppetclasses` e `config_groups` contém vários campos aninhados - todos entre chaves e separados por vírgulas, e o conjunto inteiro entre colchetes. O campo `config_groups` também contém um campo aninhado - `puppetclasses` (que não é o mesmo `puppetclasses` anterior)- que, por sua vez, contém seus próprios campos aninhados, com a mesma formatação.
+
+```
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" 'https://<Servidor Foreman>/api/hostgroups/<ID>'
+...
+{"id":<ID>,"name":"<Nome>","title":"<Título>",...,"all_puppetclasses":[{"id":<ID>,"name":"<Nome>","module_name":"<Módulo>"},{"id":<ID>,"name":"<Nome>","module_name":"<Módulo>"},...],"parameters":[],"template_combinations":[],"puppetclasses":[{"id":<ID>,"name":"<Nome>","module_name":"<Módulo>"},{"id":<ID>,"name":"<Nome>","module_name":"<Módulo>"},...}],"config_groups":[{"id":<ID>,"name":"<Nome>","created_at":"<Criação>","updated_at":"<Atualização>","puppetclasses":[{"id":<ID>,"name":"<Nome>","module_name":"<Módulo>"},{"id":<ID>,"name":"<Nome>","module_name":"<Módulo>"},...]}]}
+```
+
+Outro exemplo, agora com registros múltiplos. Note como cada registro está entre chaves, e todos, separados por vírgulas, agrupados entre colchetes.
+
+```
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" -X GET -d '{ "search":"title~<Padrão>" }' 'https://<Servidor Foreman>/api/hostgroups'
+...
+{
+  "total": <Quantidade total de registros>,
+  "subtotal": <Quantidade de registros filtrados>,
+  "page": <Página sendo mostrada>,
+  "per_page": <Quantidade de registros por página>,
+  "search": "<Expressão de busca>",
+  "sort": {
+    "by": null,
+    "order": null
+  },
+  "results": [{"id":<ID>,"name":"<Nome>","title":"<Título>",...},{"id":<ID>,"name":"<Nome>","title":"<Título>",...},{"id":<ID>,"name":"<Nome>","title":"<Título>",...},...]
+```
