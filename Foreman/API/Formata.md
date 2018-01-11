@@ -5,17 +5,17 @@
 1. [Introdução](#introdução)
 1. [Filtragem e formatação com `tr`, `sed`, `grep`, etc.](#filtragem-e-formatação-com-tr-sed-grep-etc)
   1. [Separar campos em linhas](#separar-campos-em-linhas)
-  1. [Separar campos, inclusive aninhados](#separar-campos,-inclusive-aninhados)
+  1. [Separar campos, inclusive aninhados](#separar-campos-inclusive-aninhados)
   1. [Filtrar campos](#filtrar-campos)
   1. [Filtrar trechos](#filtrar-trechos)
   1. [Filtrar campos em trechos](#filtrar-campos-em-trechos)
-  1. [Registros múltiplos](#registros-múltiplos)
+  1. [Registros múltiplos e `grep`](#registros-múltiplos-e-grep)
   1. [Mais](#mais)
 1. [Filtragem e formatação com `awk`](#filtragem-e-formatação-com-awk)
   1. [Separar campos em linhas](#separar-campos-em-linhas)
   1. [Selecionar campos](#selecionar-campos)
   1. [Remover nome do parâmetro](#remover-nome-do-parâmetro)
-  1. [Registros múltiplos](#registros-múltiplos)
+  1. [Registros múltiplos e `awk`](#registros-múltiplos-e-awk)
 
 ## Introdução
 
@@ -171,7 +171,7 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 ...
 ```
 
-### Registros múltiplos
+### Registros múltiplos e `grep`
 
 Ao filtrar saídas com múltiplos registros, é interessante processar apenas a linha contendo `"results":`, com um simples `grep`:
 
@@ -262,7 +262,7 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 <Título>
 ```
 
-### Registros múltiplos
+### Registros múltiplos e `awk`
 
 Assim como na filtragem sem `awk`, ao filtrar saídas com múltiplos registros, pode ser interessante processar apenas a linha contendo `"results":`:
 
