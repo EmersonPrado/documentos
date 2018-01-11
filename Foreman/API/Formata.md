@@ -6,7 +6,7 @@
 1. [Filtragem e formatação com `tr`, `sed`, `grep`, etc.](#filtragem-e-formatação-com-tr-sed-grep-etc)
 1. [Filtragem e formatação com `awk`](#filtragem-e-formatação-com-awk)
 
-## Formatação de resultados
+## Introdução
 
 Como a API retorna uma string enorme com todos os resultados concatenados, é difícil extrair informações diretamente, especialmente em buscas que retornam vários registros. É necessário formatar a saída de forma mais conveniente.
 
