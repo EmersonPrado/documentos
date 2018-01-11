@@ -296,6 +296,8 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 ]
 ```
 
+> A expressão regular `[,{}]` encontra uma vírgula **ou** uma chave. Aqui, queremos uma sequência de qualquer tamanho, mas o `sed` não reconhece o multiplicador `+`, das expressões regulares. Então contornamos com `<Expressão><Expressão>*`.
+
 Desta vez, os campos aninhados foram separados com clareza, ficando o campo externo em uma linha separada. Assim fica fácil filtrar campos específicos, usando `grep`:
 
 ```
