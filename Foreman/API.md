@@ -22,6 +22,7 @@
 	1. [Remover registros](#remover-registros)
 1. [Formatação de resultados](#formatação-de-resultados)
 	1. [Filtragem e formatação com `tr`, `sed`, `grep`, etc.](#filtragem-e-formatação-com-tr-sed-grep-etc)
+	1. [Filtragem e formatação com `awk`](#filtragem-e-formatação-com-awk)
 
 ## Descrição
 
@@ -362,4 +363,83 @@ Por fim, ao filtrar saídas com múltiplos registros, é interessante processar 
 $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
 	-X GET -d "{ "search":"<Filtro>" }" 'https://<Servidor Foreman>/api/hostgroups/' | \
 	grep '"results":' | sed ...
+```
+
+### Filtragem e formatação com `awk`
+
+Por embutir uma linguagem de programação razoavelmente decente e uma boa quantidade de opções, o `awk` permite uma variedade quase ilimitada de opções para processamento da saída. Recomendo a [documentação GNU](https://www.gnu.org/software/gawk/manual/gawk.html) para o `awk` e um pouco de estudo sobre [expressões regulares](http://aurelio.net/regex/).
+
+Por exemplo, para separar os campos por vírgulas e chaves, usamos a opção do delimitador de campos (`-F`), depois retornamos (`print`) os campos:
+
+```
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	https://<Servidor Foreman>/api/hostgroups/<ID> | \
+	awk -F'[{},]+' '{
+		for ( CAMPO = 1 ; CAMPO <= NF ; CAMPO++ ) {
+			print $CAMPO
+		}
+	}'
+...
+"id":<ID>
+"name":"<Nome>"
+"title":"<Título>"
+...
+"all_puppetclasses":[
+"id":<ID>
+"name":"<Classe>"
+"module_name":"<Módulo>"
+...
+]
+...
+"puppetclasses":[
+"id":<ID>
+"name":"<Classe>"
+"module_name":"<Módulo>"
+...
+]
+"config_groups":[]
+```
+
+Para selecionar campos específicos, basta usar o `if`:
+
+```
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	https://<Servidor Foreman>/api/hostgroups/<ID> | \
+	awk -F'[{},]+' '{
+		for ( CAMPO = 1 ; CAMPO <= NF ; CAMPO++ ) {
+			if ( $CAMPO ~ /"(title|environment_name)"/ ) {
+				print $CAMPO
+			}
+		}
+	}'
+...
+"title":"<Título>"
+"environment_name":<Ambiente>
+```
+
+> Importante incluir as aspas na expressão regular - `"(title|environment_name)"` - para não retornar parâmetros com nomes parecidos
+
+Se só estivermos interessados em um campo, podemos excluir a parte `"<Parâmetro>":`, e até as aspas, usando o substituidor `gsub`:
+
+```
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	https://<Servidor Foreman>/api/hostgroups/<ID> | \
+	awk -F'[{},]+' '{
+		for ( CAMPO = 1 ; CAMPO <= NF ; CAMPO++ ) {
+			if ( $CAMPO ~ /"title"/ ) {
+				gsub("^[^:]+:|\"", "", $CAMPO)
+				print $CAMPO
+			}
+		}
+	}'
+...
+<Título>
+```
+
+Assim como na filtragem sem `awk`, ao filtrar saídas com múltiplos registros, pode ser interessante processar apenas a linha contendo `"results":`:
+
+```
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	-X GET -d "{ "search":"<Filtro>" }" https://<Servidor Foreman>/api/hostgroups/ | \
+	awk -F'[{},]+' '/"results":/ { for ... }'
 ```
