@@ -4,7 +4,18 @@
 
 1. [Introdução](#introdução)
 1. [Filtragem e formatação com `tr`, `sed`, `grep`, etc.](#filtragem-e-formatação-com-tr-sed-grep-etc)
+  1. [Separar campos em linhas](#separar-campos-em-linhas)
+  1. [Separar campos, inclusive aninhados](#separar-campos,-inclusive-aninhados)
+  1. [Filtrar campos](#filtrar-campos)
+  1. [Filtrar trechos](#filtrar-trechos)
+  1. [Filtrar campos em trechos](#filtrar-campos-em-trechos)
+  1. [Registros múltiplos](#registros-múltiplos)
+  1. [Mais](#mais)
 1. [Filtragem e formatação com `awk`](#filtragem-e-formatação-com-awk)
+  1. [Separar campos em linhas](#separar-campos-em-linhas)
+  1. [Selecionar campos](#selecionar-campos)
+  1. [Remover nome do parâmetro](#remover-nome-do-parâmetro)
+  1. [Registros múltiplos](#registros-múltiplos)
 
 ## Introdução
 
@@ -49,6 +60,8 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 
 ## Filtragem e formatação com `tr`, `sed`, `grep`, etc.
 
+### Separar campos em linhas
+
 Uma necessidade natural é separar os campos com quebras de linhas, em vez de vírgulas. Isto pode ser feito facilmente com o comando `tr`:
 
 ```
@@ -66,8 +79,11 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 ...}
 ```
 
-Convenientemente, cada campo ficou em sua própria linha, permitindo filtragens adicionais com `sed` ou `grep`. Exceto nos campos aninhados (`all_puppetclasses`), pois o campo externo não é separado dos internos por vírgula, então o primeiro campo interno apareceu junto com o externo.  
-Como cada campo está delimitado por chaves, podemos separar as linhas em cada conjunto de vírgulas e/ou chaves. Pra esta filtragem mais elaborada, podemos usar o comando `sed`:
+Convenientemente, cada campo ficou em sua própria linha, permitindo filtragens adicionais com `sed` ou `grep`. Exceto nos campos aninhados (`all_puppetclasses`), pois o campo externo não é separado dos internos por vírgula, então o primeiro campo interno apareceu junto com o externo.
+
+### Separar campos, inclusive aninhados
+
+Como cada campo está delimitado por chaves, podemos separar as linhas em cada conjunto de vírgulas e/ou chaves. Pra esta filtragem mais elaborada, podemos usar o comando `sed s` (substitute):
 
 ```
 $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
@@ -89,7 +105,11 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 
 > A expressão regular `[,{}]` encontra uma vírgula **ou** uma chave. Aqui, queremos uma sequência de qualquer tamanho, mas o `sed` não reconhece o multiplicador `+`, das expressões regulares. Então contornamos com `<Expressão><Expressão>*`.
 
-Desta vez, os campos aninhados foram separados com clareza, ficando o campo externo em uma linha separada. Assim fica fácil filtrar campos específicos, usando `grep`:
+Desta vez, os campos aninhados foram separados com clareza, ficando o campo externo em uma linha separada.
+
+### Filtrar campos
+
+O comando `grep` permite a seleção de campos específicos:
 
 ```
 $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
@@ -99,7 +119,9 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 "environment_name":<Nome ambiente>
 ```
 
-Ou filtrar por trechos, usando `sed`:
+### Filtrar trechos
+
+Com o comando `sed p` (print), podemos selecionar trechos da saída (opção `-n` evita retornar outras linhas):
 
 ```
 $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
@@ -116,7 +138,11 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 ]
 ```
 
-Um problema é que há campos com nomes repetidos dentro dos campos aninhados. Por exemplo, há campos `id` no registro, e também dentro dos campos `all_puppetclasses` e `puppetclasses`. Então a filtragem com `grep` retornaria várias informações, sendo só uma correta. A solução é primeiro filtrar o trecho que contém os campos de forma única, depois os campos específicos:
+### Filtrar campos em trechos
+
+Um problema é que há campos com nomes repetidos dentro dos campos aninhados. Por exemplo, há campos `id` no registro, e também dentro dos campos `all_puppetclasses` e `puppetclasses`. Então a filtragem com `grep` retornaria várias informações, sendo só uma correta. A solução é primeiro filtrar o trecho que contém os campos de forma única, depois os campos específicos
+
+Neste exemplo, removemos tudo a partir de `all_puppetclasses`, usando o comando `sed d`:
 
 ```
 $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
@@ -132,7 +158,7 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 
 > Note a inclusão das aspas duplas no comando `grep`. Isto é necessário para filtrar campos com os nomes exatos, e não qualquer coisa que contenha "id", "name" ou "title".
 
-Outro exemplo:
+Neste outro exemplo, selecionamos o campo aninhado `all_puppetclasses`, usando o comando `sed p`:
 
 ```
 $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
@@ -145,9 +171,9 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 ...
 ```
 
-Naturalmente, pode-se filtrar e formatar mais. Por exemplo: utilizar `cut` para remover o nome do parâmetro, deixando apenas o valor (caso a consulta seja de um único campo), outro `tr` para remover as aspas, etc. O limite é a criatividade (e o tempo).
+### Registros múltiplos
 
-Por fim, ao filtrar saídas com múltiplos registros, é interessante processar apenas a linha contendo `"results":`, com um simples `grep`:
+Ao filtrar saídas com múltiplos registros, é interessante processar apenas a linha contendo `"results":`, com um simples `grep`:
 
 ```
 $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
@@ -155,11 +181,17 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 	grep '"results":' | sed ...
 ```
 
+### Mais
+
+Naturalmente, pode-se filtrar e formatar mais. Por exemplo: utilizar `cut` para remover o nome do parâmetro, deixando apenas o valor (caso a consulta seja de um único campo), outro `tr` para remover as aspas, etc. O limite é a criatividade (e o tempo).
+
 ## Filtragem e formatação com `awk`
 
 Por embutir uma linguagem de programação razoavelmente decente e uma boa quantidade de opções, o `awk` permite uma variedade quase ilimitada de opções para processamento da saída. Recomendo a [documentação GNU](https://www.gnu.org/software/gawk/manual/gawk.html) para o `awk` e um pouco de estudo sobre [expressões regulares](http://aurelio.net/regex/).
 
-Por exemplo, para separar os campos por vírgulas e chaves, usamos a opção do delimitador de campos (`-F`), depois retornamos (`print`) os campos:
+### Separar campos em linhas
+
+Para separar os campos por vírgulas e chaves, usamos a opção do delimitador de campos (`-F`), depois retornamos (`print`) os campos:
 
 ```
 $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
@@ -190,6 +222,8 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 "config_groups":[]
 ```
 
+### Selecionar campos
+
 Para selecionar campos específicos, basta usar o `if`:
 
 ```
@@ -209,6 +243,8 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 
 > Importante incluir as aspas na expressão regular - `"(title|environment_name)"` - para não retornar parâmetros com nomes parecidos
 
+### Remover nome do parâmetro
+
 Se só estivermos interessados em um campo, podemos excluir a parte `"<Parâmetro>":`, e até as aspas, usando o substituidor `gsub`:
 
 ```
@@ -225,6 +261,8 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 ...
 <Título>
 ```
+
+### Registros múltiplos
 
 Assim como na filtragem sem `awk`, ao filtrar saídas com múltiplos registros, pode ser interessante processar apenas a linha contendo `"results":`:
 
