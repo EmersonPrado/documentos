@@ -216,5 +216,5 @@ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: ap
 
 ## Ver também
 
-[Formatação de resultados de consultas à API do Foreman](API/Formata.md)
-[Exemplos de utilização da API do Foreman](API/Exemplos.md)
+- [Formatação de resultados de consultas à API do Foreman](API/Formata.md)
+- [Exemplos de utilização da API do Foreman](API/Exemplos.md)
