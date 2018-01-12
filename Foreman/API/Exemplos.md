@@ -12,7 +12,7 @@
 	1. [Procurar um host usando coringa](#procurar-um-host-usando-coringa)
 	1. [Filtrar parâmetros da listagem de hosts](#filtrar-parâmetros-da-listagem-de-hosts)
 1. [Alterações múltiplas](#alterações-múltiplas)
-	1. [Configurar vários grupos no mesmo host](configurar-vários-grupos-no-mesmo-host)
+	1. [Configurar vários grupos no mesmo host](#configurar-vários-grupos-no-mesmo-host)
 1. [Operações avançadas](#operações-avançadas)
 	1. [Verificar tempo (em segundos) da última sincronização de um host com o Foreman](#verificar-tempo-em-segundos-da-última-sincronização-de-um-host-com-o-foreman)
 
@@ -126,8 +126,8 @@ $ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: 
 ```
 $ { \
 	date +"%s %z" | sed 's/\([+-]*\)\(..\)\(..\)$/\1\2 \1\3/'; \
-	curl -ku emerson.prado -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
-	https://foreman.prj.configdtp/api/hosts/<FQDN> | \
+	curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+	https://<Foreman>/api/hosts/<FQDN> | \
 		awk -F, '{ for ( CAMPO = 1 ; CAMPO <= NF ; CAMPO++ ) { if ( $CAMPO ~ /last_report/ ) {
 			gsub("\"last_report\":", "", $CAMPO) ; system("date +%s -d "$CAMPO"")
 		} } }';\
@@ -141,17 +141,15 @@ $ {
     date +"%s %z" | \                                         	# Mostra a data em segundos desde o "epoch" (%s) e o fuso horário em minutos (%z)
       sed 's/\([+-]*\)\(..\)\(..\)$/\1\2 \1\3/'; \            	# Reformata o fuso horário - Separa horas de minutos e repete o sinal das horas nos minutos
     curl \
-        -ku emerson.prado \
+        -ku <Usuário> \
         -H "Accept: version=2,application/json" \
         -H "Content-Type: application/json" \
-        https://foreman.prj.configdtp/api/hosts/<FQDN> | \    	# Lista os parâmetros do host especificado
-      awk -F, '{																						  	# Separa parâmetros por vírgula
-			awk -F, '{ for ( CAMPO = 1 ; CAMPO <= NF ; CAMPO++ ) {  	# Processa um campo por vez
+        https://<Foreman>/api/hosts/<FQDN> | \                	# Lista os parâmetros do host especificado
+      awk -F, '{ for ( CAMPO = 1 ; CAMPO <= NF ; CAMPO++ ) {  	# Separa parâmetros por vírgula e processa um por vez
         if ( $CAMPO ~ /last_report/ ) {                       	# Encontra o parâmetro "last_report" (horário da última sincronização)
           gsub("\"last_report\":", "", $CAMPO)                	# Remove o nome do parâmetro (deixa apenas o valor)
           system("date +%s -d "$CAMPO"") }                    	# Retorna o valor, em segundos desde o "epoch"
-        }
-      }';
+      } }';
 	} | \
     awk '
       NF == 3 { printf "%s - %s * 3600 - %s * 60 - ", $1, $2, $3 }    # Corrige o fuso horário da primeira linha (horário atual) para UTC
