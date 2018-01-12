@@ -15,6 +15,7 @@
 	1. [Configurar vários grupos no mesmo host](#configurar-vários-grupos-no-mesmo-host)
 1. [Operações avançadas](#operações-avançadas)
 	1. [Verificar tempo (em segundos) da última sincronização de um host com o Foreman](#verificar-tempo-em-segundos-da-última-sincronização-de-um-host-com-o-foreman)
+	1. [Indentar campos aninhados](#indentar-campos-aninhados)
 
 ## Operações básicas
 
@@ -156,4 +157,41 @@ $ {
       NF == 1 { print $0 }                                            # Subtrai a segunda linha (horário da última sincronização)
     ' | \
     bc                                                              	# Processa fórmula
+```
+
+### Indentar campos aninhados
+
+```
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+  'https://<Foreman>/api/hostgroups/<ID>' | \
+    awk -F'[{},]+' 'BEGIN { NIVEL = 0 } { for ( PARAM = 1 ; PARAM <= NF ; PARAM++ ) {
+      for ( CONT = 0 ; CONT < NIVEL ; CONT++ ) { printf "  " }
+      print $PARAM
+      STR_INC = STR_DEC = $PARAM ; gsub(/[^[]/, "", STR_INC) ; gsub(/[^]]/, "", STR_DEC)
+      NIVEL += length(STR_INC) - length(STR_DEC)
+    } }'
+```
+
+Destrinchando:
+
+```
+$ curl -ku <Usuário> -H "Accept: version=2,application/json" -H "Content-Type: application/json" \
+  'https://<Foreman>/api/hostgroups/<ID>' | \             # Lista os parâmetros do grupo com ID 30
+    awk -F'[{},]+' '                                      # Separa parâmetros por vírgulas e chaves
+      BEGIN {
+        NIVEL = 0                                         # Inicializa nível de indentação
+      }
+      {
+        for ( PARAM = 1 ; PARAM <= NF ; PARAM++ ) {       # Processa um parâmetro por vez
+          for ( CONT = 0 ; CONT < NIVEL ; CONT++ ) {
+            printf "  "                                   # Precede cada parâmetro com 2 espaços por nível de indentação
+          }
+          print $PARAM                                    # Retorna o parâmetro - já indentado
+          STR_INC = STR_DEC = $PARAM                      # Inicializa strings para atualizar nível de indentação
+          gsub(/[^[]/, "", STR_INC)                       # String com caracteres para aumentar indentação - '['
+          gsub(/[^]]/, "", STR_DEC)                       # String com caracteres para reduzir indentação - ']'
+          NIVEL += length(STR_INC) - length(STR_DEC)      # Atualiza nível de indentação conforme caracteres encontrados
+        }
+      }
+    '
 ```
