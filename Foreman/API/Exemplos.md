@@ -156,7 +156,7 @@ $ {
       NF == 3 { printf "%s - %s * 3600 - %s * 60 - ", $1, $2, $3 }    # Corrige o fuso horário da primeira linha (horário atual) para UTC
       NF == 1 { print $0 }                                            # Subtrai a segunda linha (horário da última sincronização)
     ' | \
-    bc                                                              	# Processa fórmula
+    bc                                                                # Processa fórmula
 ```
 
 ### Indentar campos aninhados
