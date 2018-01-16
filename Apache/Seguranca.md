@@ -9,6 +9,8 @@
   1. [Bloquear login remoto](#bloquear-login-remoto)
   1. [_Softwares_ de _cache_ e _proxy_](#softwares-de-cache-e-proxy)
 1. [Conteúdo](#conteúdo)
+1. [SELinux](#selinux)
+  1. [Como verificar](#como-verificar)
 
 ## Introdução
 
@@ -71,3 +73,22 @@ drwxr-x---   3 apache apache    4096 Jan 15 18:20 /var/www/html/<vhost>
 ```
 
 > Em servidores Debian < 8, substituir `/var/www/html` por `/var/www`
+
+## SELinux
+
+O SELinux é uma camada adicional de proteção do sistema de arquivos do Linux. Neste, o acesso aos arquivos é filtrado por **contextos** - grosso modo, conjunto de informações sobre autenticação do arquivo, determinando quais processos podem acessá-los. Então, precisamos configurar um **contexto** do conteúdo Web adequado para o Apache.
+
+### Como verificar
+
+Muitos comandos de consulta aceitam a opção `-Z`, que inclui informações de contexto SELinux na saída. O comando `ls` é um deles:
+
+```
+$ ls -Zd /{,var{,/www{,/html{,/*}}}}
+drwxr-xr-x  root root system_u:object_r:root_t         /
+drwxr-xr-x  root root system_u:object_r:var_t          /var
+drwxr-xr-x  root root system_u:object_r:httpd_sys_content_t /var/www
+drwxr-xr-x  root root system_u:object_r:httpd_sys_content_t /var/www/html
+-rw-r--r--  root root user_u:object_r:httpd_sys_content_t /var/www/html/index.html
+```
+
+A saída mostra que os arquivos de conteúdo - `/var/www/*` - possuem o contexto `...httpd_sys_content_t`. O sufixo `_t` significa "tipo", e o tipo especificado é conteúdo http.
