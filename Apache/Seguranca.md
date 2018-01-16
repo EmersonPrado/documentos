@@ -8,6 +8,7 @@
   1. [Bloquear login local](#bloquear-login-local)
   1. [Bloquear login remoto](#bloquear-login-remoto)
   1. [_Softwares_ de _cache_ e _proxy_](#softwares-de-cache-e-proxy)
+1. [Conteúdo](#conteúdo)
 
 ## Introdução
 
@@ -40,3 +41,33 @@ Algumas ferramentas de _cache_ e _proxy_, como o [Varnish](http://varnish-cache.
 Quando estas ferramentas são utilizadas, são elas que ficam com portas abertas para _hosts_ remotos. Em caso de comprometimento, a utilização deste usuário/grupo restrito minimiza a vulnerabilidade do servidor.
 
 Caso seja inevitável alterar, utilizar usuário/grupo também fortemente restrito. Uma **péssima** ideia é utilizar o usuário/grupo do Apache - Um comprometimento da ferramenta torna **todo** o conteúdo Web visível - inclusive código fonte.
+
+## Conteúdo
+
+Com exceção de alguns serviços que permitem ao usuário alterar o conteúdo Web (blogs, por exemplo), o servidor http deve somente ler, e nunca alterar, os arquivos de conteúdo. Portanto, a recomendação é manter estes arquivos, e seus diretórios, com permissão apenas de leitura para o usuário/grupo do Apache, e nenhuma outra permissão para qualquer outro usuário, exceto `root`.
+
+Uma opção é manter o caminho completo pertencente a `root:root` e as permissões de escrita apenas para o usuárion `root`:
+
+```
+$ ls -ld /{,var{,/www{,/html{,/*}}}}
+drwxr-xr-x. 21 root   root      4096 Jan 15 18:20 /var
+drwxr-xr-x   6 root   root      4096 Jan 15 18:20 /var/www
+drwxr-xr-x   3 root   root      4096 Jan 15 18:20 /var/www/html
+drwxr-xr-x   3 root   root      4096 Jan 15 18:20 /var/www/html/<vhost>
+-rw-r--r--   5 root   root      4096 Jan 15 18:20 /var/www/html/<vhost>/index.html
+...
+```
+
+Uma alternativa, mais restrita, é atribuir o conteúdo Web ao grupo do Apache e permitir a leitura apenas a este grupo. O acesso pelo processo do Apache continua o mesmo, mas outros usuários não podem ler o conteúdo Web (substituir `apache` pelo usuário padrão da distro):
+
+```
+$ ls -ld /{,var{,/www{,/html{,/*}}}}
+drwxr-xr-x. 21 root   root      4096 Jan 15 18:20 /var
+drwxr-xr-x   6 root   root      4096 Jan 15 18:20 /var/www
+drwxr-x---   3 apache apache    4096 Jan 15 18:20 /var/www/html
+drwxr-x---   3 apache apache    4096 Jan 15 18:20 /var/www/html/<vhost>
+-rw-r-----   5 apache apache    4096 Jan 15 18:20 /var/www/html/<vhost>/index.html
+...
+```
+
+> Em servidores Debian < 8, substituir `/var/www/html` por `/var/www`
