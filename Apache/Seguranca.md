@@ -81,6 +81,22 @@ O SELinux é uma camada adicional de proteção do sistema de arquivos do Linux.
 
 ### Como verificar
 
+Inicialmente, é necessário checar se o SELinux está habilitado:
+
+```
+$ getenforce                              # Estado atual
+$ grep 'SELINUX=' /etc/sysconfig/selinux  # Estado persistente
+```
+
+> O estado persistente determina o estado do SELinux ao iniciar o SO
+
+O estado pode ser:
+- `enforcing` - SELinux ativo, efetivamente bloqueando acesso não autorizado
+- `permissive` - SELinux registra acessos não autorizados, mas não bloqueia
+- `disabled` - SELinux inativo
+
+> Verificar com o mantenedor do servidor qual o estado correto
+
 Muitos comandos de consulta aceitam a opção `-Z`, que inclui informações de contexto SELinux na saída. O comando `ls` é um deles:
 
 ```
@@ -95,6 +111,20 @@ drwxr-xr-x  root root system_u:object_r:httpd_sys_content_t /var/www/html
 A saída mostra que os arquivos de conteúdo - `/var/www/*` - possuem o contexto `...httpd_sys_content_t`. O sufixo `_t` significa "tipo", e o tipo especificado é conteúdo http.
 
 ### Como alterar
+
+Caso o SELinux esteja em modo `permissive` e seja necessário alterar para `enforcing`, ou vice-versa, basta alterar os estados atual e persistente:
+
+```
+setenforce <Modo> # 0 para permissive e 1 para enforcing
+```
+
+Alterar a linha `SELINUX=` do arquivo `/etc/sysconfig/selinux` para o modo correto
+
+Caso seja necessário alterar de/para `disabled`, é necessário alterar o arquivo acima e reiniciar. O SELinux não permite esta alteração "a quente".
+
+> Verificar com o mantenedor do servidor qual o estado correto
+
+Então, caso o SELinux esteja sendo usado, e o contexto não for o adequado para o Apache, corrigir o contexto:
 
 ```
 semanage fcontext -a -t httpd_sys_content_t "/var/www(/.*)?"  # Inclui contexto
