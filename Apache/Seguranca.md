@@ -11,6 +11,7 @@
 1. [Conteúdo](#conteúdo)
 1. [SELinux](#selinux)
   1. [Como verificar](#como-verificar)
+  1. [Como alterar](#como-alterar)
 
 ## Introdução
 
@@ -92,3 +93,10 @@ drwxr-xr-x  root root system_u:object_r:httpd_sys_content_t /var/www/html
 ```
 
 A saída mostra que os arquivos de conteúdo - `/var/www/*` - possuem o contexto `...httpd_sys_content_t`. O sufixo `_t` significa "tipo", e o tipo especificado é conteúdo http.
+
+### Como alterar
+
+```
+semanage fcontext -a -t httpd_sys_content_t "/var/www(/.*)?"  # Inclui contexto
+restorecon -R -v /var/www                                     # Aplica contexto
+```
