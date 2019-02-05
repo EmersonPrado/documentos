@@ -1,0 +1,1 @@
+- [pip doesn't respect proxy while installing packages from requirements file #1805](https://github.com/pypa/pip/issues/1805)
