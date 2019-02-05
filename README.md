@@ -6,7 +6,8 @@
 1. [Banco](#banco)
   1. [Oracle](#oracle)
 1. [Foreman](#foreman)
-1. [Python](#python)
+1. [Programação](#programação)
+  1. [Python](#python)
 
 ## Apache
 
@@ -22,7 +23,9 @@
 
 - [API](Foreman/API.md)
 
-## Python
+## Programação
+
+### Python
 
 - [Bugs](Python/Bugs.md)
 - [Fabric](Python/Fabric.md)
