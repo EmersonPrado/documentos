@@ -19,10 +19,6 @@
 
 - [Estrutura de dados](Banco/Oracle/Estrutura.md)
 
-## Apache
-
-- [Segurança](Apache/Seguranca.md)
-
 ## Foreman
 
 - [API](Foreman/API.md)
